@@ -5,7 +5,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/robertkrimen/otto/parser"
+	"github.com/ivahaev/otto/parser"
 )
 
 func TestOtto(t *testing.T) {
@@ -332,7 +332,7 @@ func TestTryFinally(t *testing.T) {
                 finally {
                     def = 1;
                     continue;
-                }   
+                }
                 def -= 1;
             }
             while (abc < 2)

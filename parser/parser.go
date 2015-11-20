@@ -39,9 +39,9 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/robertkrimen/otto/ast"
-	"github.com/robertkrimen/otto/file"
-	"github.com/robertkrimen/otto/token"
+	"github.com/ivahaev/otto/ast"
+	"github.com/ivahaev/otto/file"
+	"github.com/ivahaev/otto/token"
 )
 
 // A Mode value is a set of flags (or 0). They control optional parser functionality.

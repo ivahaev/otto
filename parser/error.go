@@ -3,9 +3,10 @@ package parser
 import (
 	"fmt"
 	"sort"
+	"strings"
 
-	"github.com/robertkrimen/otto/file"
-	"github.com/robertkrimen/otto/token"
+	"github.com/ivahaev/otto/file"
+	"github.com/ivahaev/otto/token"
 )
 
 const (
@@ -52,6 +53,7 @@ const (
 type Error struct {
 	Position file.Position
 	Message  string
+	Line     string
 }
 
 // FIXME Should this be "SyntaxError"?
@@ -61,11 +63,12 @@ func (self Error) Error() string {
 	if filename == "" {
 		filename = "(anonymous)"
 	}
-	return fmt.Sprintf("%s: Line %d:%d %s",
+	return fmt.Sprintf("%s: Line %d:%d %s %s",
 		filename,
 		self.Position.Line,
 		self.Position.Column,
 		self.Message,
+		self.Line,
 	)
 }
 
@@ -86,7 +89,22 @@ func (self *_parser) error(place interface{}, msg string, msgValues ...interface
 
 	position := self.position(idx)
 	msg = fmt.Sprintf(msg, msgValues...)
-	self.errors.Add(position, msg)
+	lines := strings.Split(self.str, "\n")
+	var line string
+	if len(lines) >= position.Line-1 {
+		line = "\r\n" + lines[position.Line-1]
+		line += "\r\n"
+		var i int
+		for {
+			if i == position.Column - 1 {
+				break
+			}
+			line += "~"
+			i++
+		}
+		line += "^"
+	}
+	self.errors.Add(position, msg, line)
 	return self.errors[len(self.errors)-1]
 }
 
@@ -124,8 +142,8 @@ func (self *_parser) errorUnexpectedToken(tkn token.Token) error {
 type ErrorList []*Error
 
 // Add adds an Error with given position and message to an ErrorList.
-func (self *ErrorList) Add(position file.Position, msg string) {
-	*self = append(*self, &Error{position, msg})
+func (self *ErrorList) Add(position file.Position, msg, line string) {
+	*self = append(*self, &Error{position, msg, line})
 }
 
 // Reset resets an ErrorList to no errors.
